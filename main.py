@@ -5,6 +5,7 @@ import os
 import requests
 from botocore.exceptions import BotoCoreError, ClientError
 from uuid import uuid4
+import time
 
 app = FastAPI()
 
@@ -20,7 +21,7 @@ rekognition = boto3.client(
     "rekognition",
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("AWS_DEFAULT_REGION", "eu-north-1")
+    region_name="eu-north-1"
 )
 
 BUCKET_NAME = "bucketforn8nimagesr8me"
@@ -46,6 +47,8 @@ async def detect_faces(request: ImageUrlRequest):
         s3.put_object(Bucket=BUCKET_NAME, Key=filename, Body=image_bytes)
     except (BotoCoreError, ClientError) as e:
         raise HTTPException(status_code=500, detail=f"Failed to upload to S3: {e}")
+
+    time.sleep(3)
 
     # Call Rekognition on the image in S3
     try:
